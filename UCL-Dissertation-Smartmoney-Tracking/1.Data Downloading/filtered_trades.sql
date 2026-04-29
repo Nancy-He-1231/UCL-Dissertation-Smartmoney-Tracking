@@ -30,7 +30,6 @@ ethereum_trades AS (
     WHERE t.blockchain = 'ethereum'
         AND t.block_time >= CURRENT_DATE - INTERVAL '90' day
         AND t.amount_usd >= 10
-        AND t.amount_usd < 5000000
 )
 
 SELECT * 

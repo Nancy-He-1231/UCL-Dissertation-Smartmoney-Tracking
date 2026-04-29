@@ -1,8 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Ethereum DEX Trading Behavior Simplified Analysis
-Generate only: Table 1 + Figure 1 + Figure 2
 """
 
 import pandas as pd
@@ -22,14 +19,14 @@ def main():
     """Main analysis function"""
     
     print("=" * 100)
-    print("📊 Ethereum DEX Trading Behavior Simplified Analysis")
+    print("Ethereum DEX Trading Behavior Simplified Analysis")
     print("=" * 100)
     
     # Load and process data
     df = load_and_preprocess_data()
     
     if df is None:
-        print("❌ Failed to load data. Exiting.")
+        print("Failed to load data. Exiting.")
         return None
     
     # Run analysis
@@ -44,8 +41,8 @@ def main():
     # 3. Generate Figure 2: Scatter Plot
     create_frequency_amount_scatter(df)
     
-    print("\n🎉 Analysis completed successfully!")
-    print("📁 Output files:")
+    print("\n Analysis completed successfully!")
+    print("Output files:")
     print("   - Table 1: Descriptive Statistics (console output)")
     print("   - Figure 1: 24_hour_trading_pattern.png")
     print("   - Figure 2: frequency_vs_amount_scatter.png")
@@ -55,7 +52,7 @@ def main():
 def load_and_preprocess_data():
     """Load and preprocess trading data"""
     
-    print("📊 Loading and preprocessing data...")
+    print("Loading and preprocessing data...")
     
     # Try to load real data files
     df = None
@@ -64,16 +61,16 @@ def load_and_preprocess_data():
     for filename in ['filtered_trades.csv', 'ethereum_trades.csv', 'trading_data.csv']:
         try:
             df = pd.read_csv(filename)
-            print(f"✅ Successfully loaded: {filename} ({df.shape[0]:,} rows × {df.shape[1]} columns)")
+            print(f"Successfully loaded: {filename} ({df.shape[0]:,} rows × {df.shape[1]} columns)")
             break
         except FileNotFoundError:
             continue
     
     # If no real data found, generate demo data
     if df is None:
-        print("⚠️  No data files found. Generating demo data for analysis...")
+        print("No data files found. Generating demo data for analysis...")
         df = generate_demo_data()
-        print(f"✅ Generated demo data: {df.shape[0]:,} rows × {df.shape[1]} columns")
+        print(f"Generated demo data: {df.shape[0]:,} rows × {df.shape[1]} columns")
     
     # Preprocess the data
     df = preprocess_data(df)
@@ -114,7 +111,7 @@ def generate_demo_data():
 def preprocess_data(df):
     """Preprocess the trading data"""
     
-    print("🔧 Preprocessing data...")
+    print("Preprocessing data...")
     
     # Identify key columns
     columns = {
@@ -125,7 +122,7 @@ def preprocess_data(df):
         'dex': find_column(df, ['dex_name', 'project', 'exchange', 'protocol'])
     }
     
-    print("📋 Identified columns:")
+    print("Identified columns:")
     for key, col in columns.items():
         print(f"   {key}: {col}")
     
@@ -146,7 +143,7 @@ def preprocess_data(df):
         df = df[(df[columns['amount']] >= q01) & (df[columns['amount']] <= q99)]
         print(f"   Removed {before_len - len(df):,} extreme outliers")
     
-    print(f"✅ Final dataset: {len(df):,} transactions")
+    print(f"Final dataset: {len(df):,} transactions")
     
     return df
 
@@ -162,13 +159,13 @@ def generate_descriptive_statistics_table(df):
     """Generate Table 1: Descriptive Statistics of Transaction Amounts"""
     
     print("\n" + "="*80)
-    print("📋 TABLE 1: DESCRIPTIVE STATISTICS OF TRANSACTION AMOUNTS")
+    print("TABLE 1: DESCRIPTIVE STATISTICS OF TRANSACTION AMOUNTS")
     print("="*80)
     
     amount_col = find_column(df, ['amount_usd', 'amount', 'value_usd'])
     
     if not amount_col:
-        print("❌ No amount column found")
+        print("No amount column found")
         return
     
     amounts = df[amount_col].dropna()
@@ -199,7 +196,7 @@ def generate_descriptive_statistics_table(df):
     print("\\end{tabular}")
     print("\\end{table}")
     
-    print(f"\n📊 Summary Statistics:")
+    print(f"\n Summary Statistics:")
     print(f"Sample Size: {len(amounts):,}")
     print(f"Total Volume: ${amounts.sum():,.0f}")
     print(f"Mean: ${stats_desc['mean']:,.2f}")
@@ -212,11 +209,11 @@ def create_24hour_pattern(df):
     """Create Figure 1: 24-Hour Distribution Pattern of Ethereum DEX Trading"""
     
     print("\n" + "="*80)
-    print("📊 FIGURE 1: 24-HOUR DISTRIBUTION PATTERN")
+    print("FIGURE 1: 24-HOUR DISTRIBUTION PATTERN")
     print("="*80)
     
     if 'hour' not in df.columns:
-        print("❌ No time data available")
+        print("No time data available")
         return
     
     # Set clean style
@@ -255,76 +252,125 @@ def create_24hour_pattern(df):
     plt.savefig('24_hour_trading_pattern.png', dpi=300, bbox_inches='tight',
                facecolor='white', edgecolor='none')
     plt.show()
-    print(f"✅ Figure 1: 24-hour trading pattern saved as '24_hour_trading_pattern.png'")
+    print(f"Figure 1: 24-hour trading pattern saved as '24_hour_trading_pattern.png'")
 
 def create_frequency_amount_scatter(df):
-    """Create Figure 2: Scatter Plot of Wallet Transaction Frequency versus Average Transaction Amount"""
+    """Create Figure 2: Scatter Plot + Marginal Distributions (UPDATED)"""
     
     print("\n" + "="*80)
-    print("📊 FIGURE 2: FREQUENCY VS AMOUNT SCATTER PLOT")
+    print("FIGURE 2: FREQUENCY VS AMOUNT (WITH MARGINAL DISTRIBUTIONS)")
     print("="*80)
     
     amount_col = find_column(df, ['amount_usd', 'amount', 'value_usd'])
     wallet_col = find_column(df, ['wallet_address', 'taker', 'user_address'])
     
     if not amount_col or not wallet_col:
-        print("❌ Required columns not found")
+        print("Required columns not found")
         return
-    
-    # Set clean style
-    plt.style.use('default')
-    plt.rcParams['figure.figsize'] = (10, 8)
-    plt.rcParams['font.size'] = 12
-    plt.rcParams['axes.facecolor'] = 'white'
-    plt.rcParams['figure.facecolor'] = 'white'
-    
-    plt.figure(figsize=(10, 8))
     
     wallet_stats = df.groupby(wallet_col).agg({
         amount_col: ['count', 'mean']
     })
     wallet_stats.columns = ['transaction_count', 'avg_amount']
     
-    # Sample for better visualization if too many points
     if len(wallet_stats) > 2000:
         sample_data = wallet_stats.sample(2000, random_state=42)
     else:
         sample_data = wallet_stats
     
-    plt.scatter(sample_data['transaction_count'], sample_data['avg_amount'], 
-               alpha=0.6, s=30, c='darkblue', edgecolors='white', linewidth=0.5)
-    plt.title('Scatter Plot of Wallet Transaction Frequency versus Average Transaction Amount', 
-              fontsize=14, fontweight='bold')
-    plt.xlabel('Transaction Count per Wallet', fontsize=12)
-    plt.ylabel('Average Transaction Amount (USD)', fontsize=12)
-    plt.xscale('log')
-    plt.yscale('log')
+    sample_data = sample_data[
+        (sample_data['transaction_count'] > 0) &
+        (sample_data['avg_amount'] > 0)
+    ]
     
-    # Add correlation info
+    # ==============================
+    # jointplot + marginal distributions
+    # ==============================
+    g = sns.jointplot(
+        data=sample_data,
+        x='transaction_count',
+        y='avg_amount',
+        kind='scatter',
+        height=8,
+        space=0,
+        marginal_kws=dict(fill=True),  
+        joint_kws=dict(alpha=0.6, s=30, color='darkblue', edgecolor='white', linewidth=0.3)
+    )
+
+    g.ax_marg_x.clear()
+    g.ax_marg_y.clear()
+
+    # Top KDE（Transaction Count）
+    sns.kdeplot(
+        x=sample_data['transaction_count'],
+        ax=g.ax_marg_x,
+        fill=True,
+        color='darkblue',
+        alpha=0.6,
+        bw_adjust=0.6
+    )
+
+    # Right KDE（Amount）
+    sns.kdeplot(
+        y=sample_data['avg_amount'],
+        ax=g.ax_marg_y,
+        fill=True,
+        color='darkblue',
+        alpha=0.6,
+        bw_adjust=0.6
+    )
+
+    g.ax_marg_y.set_xlabel('')
+    g.ax_marg_y.set_xticks([])
+    g.ax_marg_x.set_ylabel('')
+    g.ax_marg_x.set_yticks([])
+    
+    g.ax_joint.set_xscale('log')
+    g.ax_joint.set_yscale('log')
+    g.ax_marg_x.set_xscale('log')
+    g.ax_marg_y.set_yscale('log')
+    
+    g.set_axis_labels(
+        'Transaction Count per Wallet',
+        'Average Transaction Amount (USD)'
+    )
+    
     correlation = sample_data['transaction_count'].corr(sample_data['avg_amount'])
-    plt.text(0.05, 0.95, f'Correlation: {correlation:.3f}', 
-            transform=plt.gca().transAxes, fontsize=12, 
-            bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
     
-    # Clean styling
-    plt.gca().spines['top'].set_visible(False)
-    plt.gca().spines['right'].set_visible(False)
-    plt.gca().set_facecolor('white')
+    g.ax_joint.text(
+        0.05, 0.95,
+        f'Correlation: {correlation:.3f}',
+        transform=g.ax_joint.transAxes,
+        fontsize=12,
+        bbox=dict(boxstyle='round', facecolor='white', alpha=0.8)
+    )
+    
+    plt.suptitle(
+        'Scatter Plot of Wallet Transaction Frequency versus Average Transaction Amount\n(with Marginal Distributions)',
+        fontsize=14,
+        fontweight='bold'
+    )
     
     plt.tight_layout()
-    plt.savefig('frequency_vs_amount_scatter.png', dpi=300, bbox_inches='tight',
-               facecolor='white', edgecolor='none')
+    
+    plt.savefig(
+        'frequency_vs_amount_scatter.png',
+        dpi=300,
+        bbox_inches='tight',
+        facecolor='white',
+        edgecolor='none'
+    )
+    
     plt.show()
-    print(f"✅ Figure 2: Frequency vs amount scatter plot saved as 'frequency_vs_amount_scatter.png'")
 
 if __name__ == "__main__":
-    print("🚀 Starting Simplified Ethereum DEX Trading Analysis...")
+    print("Starting Simplified Ethereum DEX Trading Analysis...")
     result = main()
     if result is not None:
-        print("🎉 Analysis completed successfully!")
-        print("\n📋 Summary of outputs:")
+        print("Analysis completed successfully!")
+        print("\n Summary of outputs:")
         print("   1. Table 1: Descriptive Statistics (LaTeX format in console)")
         print("   2. Figure 1: 24_hour_trading_pattern.png")
         print("   3. Figure 2: frequency_vs_amount_scatter.png")
     else:
-        print("❌ Analysis failed.")
+        print("Analysis failed.")
