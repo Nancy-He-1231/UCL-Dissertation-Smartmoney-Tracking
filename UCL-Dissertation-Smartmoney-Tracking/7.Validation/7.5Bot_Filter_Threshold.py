@@ -5,13 +5,13 @@ SCREENING CRITERIA SENSITIVITY ANALYSIS — BOT FILTER
 Purpose : Tests whether XGBoost results are sensitive to the bot filter
           threshold (100 tx/day in baseline).
 
-Input   : filtered_trades.csv   (output of your cleaning pipeline)
-          advanced_features.csv (output of feature engineering)
-          smart_money_labels.csv(your ground truth labels)
+Input   : filtered_trades.csv   
+          advanced_features.csv 
+          smart_money_labels.csv
 
-Output  : sensitivity_bot_filter.csv  — results across bot thresholds
-          sensitivity_summary.txt     — human-readable summary + thesis text
-          sensitivity_plots.png       — visualisation
+Output  : sensitivity_bot_filter.csv  
+          sensitivity_summary.txt     
+          sensitivity_plots.png       
 =============================================================================
 """
 
@@ -45,7 +45,7 @@ TIME_COL    = 'block_time'
 AMOUNT_COL  = 'amount_usd'
 
 BASELINE_BOT_THRESHOLD = 100
-BASELINE_VALUE_CAP     = 5_000_000   # kept only to hold other screening constant
+BASELINE_VALUE_CAP     = 5_000_000   
 BASELINE_VALUE_FLOOR   = 1
 MIN_TRADES             = 10
 MIN_ACTIVE_DAYS        = 5
